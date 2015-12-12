@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cek Ongkir JNE</title>
+	
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<link href="styles.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Cek Ongkir</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">JNE</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="jumbotron">
+      <div class="container">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Cek Tarif</h4>
+				</div>
+				<div class="modal-body">
+					<div id="forms">
+						<div class="form-group">
+							<label for="kota_pengirim">Kota Pengirim</label>
+							<input type="text" class="form-control" id="kota_pengirim" placeholder="Pengirim">
+							<input type="hidden" name="loader_kota_pengirim_label" id="loader_kota_pengirim_label">
+							<input type="hidden" name="loader_kota_pengirim" id="loader_kota_pengirim">
+						</div>					
+						<div class="form-group">
+							<label for="kota_tujuan">Kota Tujuan</label>
+							<input type="text" class="form-control" id="kota_tujuan" placeholder="Penerima">
+							<input type="hidden" name="loader_kota_tujuan_label" id="loader_kota_tujuan_label">
+							<input type="hidden" name="loader_kota_tujuan" id="loader_kota_tujuan">
+						</div>
+						<div class="form-group">
+							<label for="berat">Berat</label>
+							<input type="text" class="form-control" id="berat" placeholder="Weight (Kg)">
+						</div>
+					</div>
+					<div id="formResult"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" onClick="search()" class="btn btn-primary" id="search">Search</button>
+					<button type="button" onClick="back()" class="btn btn-danger" id="back" style="display:none">Back</button>
+				</div>
+			</div>
+		</div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script>
+		var url = "src/index.php";
+		
+		function search(){
+			var fromCode = $('#loader_kota_pengirim').val();
+			var destCode = $('#loader_kota_tujuan').val();
+			var fromLabel = $('#loader_kota_pengirim_label').val();
+			var destLabel = $('#loader_kota_tujuan_label').val();
+			var berat = $('#berat').val(); 
+			
+			$.ajax({
+				type	:'GET',
+				url		: url,
+				data	: "mode=cari&origin=" + fromCode + "&dest=" + destCode + "&weight=" + berat + "&originlabel=" + fromLabel + "&destlabel=" + destLabel,
+				success	: function(data){console.log(data);
+					$("#forms").hide();
+					$('#back').show();
+					$('#search').hide();
+					$("#formResult").html(data);
+				}
+			});
+		}
+		
+		function back(){
+			location.reload();
+		}
+		
+		$(function() {
+			
+			$( "#kota_pengirim" ).autocomplete({
+				source: ''+url+'?mode=from',
+				minLength: 2,
+				select: function( event, ui ) {
+					$( "#kota_pengirim" ).val( ui.item.label );
+					$( "#loader_kota_pengirim" ).val( ui.item.code );
+					$( "#loader_kota_pengirim_label" ).val( ui.item.label );
+					return false;
+				}
+			});
+			
+			$( "#kota_tujuan" ).autocomplete({
+				source: ''+url+'?mode=dest',
+				minLength: 2,
+				select: function( event, ui ) {
+					$( "#kota_tujuan" ).val( ui.item.label );
+					$( "#loader_kota_tujuan" ).val( ui.item.code );
+					$( "#loader_kota_tujuan_label" ).val( ui.item.label );
+					return false;
+				}
+			});
+		});
+	</script>
+  </body>
+</html>
